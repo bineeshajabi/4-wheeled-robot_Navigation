@@ -1,232 +1,239 @@
-4-Wheeled Robot Navigation with Sensor Fusion (ROS 2 & Gazebo)
-Overview
+# 4-Wheeled Mobile Robot – ROS 2 Navigation & Sensor Fusion
 
-This repository demonstrates a complete 4-wheeled differential drive robot simulation using ROS 2 and Gazebo. It includes:
+This repository contains the complete implementation of a **4-wheeled differential drive mobile robot** simulated using **ROS 2 Jazzy**, **Gazebo**, **SLAM Toolbox**, **robot_localization**, and the **Nav2 Navigation Stack**, with autonomous goal execution and **EKF-based sensor fusion** for drift reduction.
 
-Differential drive simulation
+The project demonstrates correct usage of ROS 2 navigation architecture, differential drive simulation, Extended Kalman Filter configuration, SLAM mapping, AMCL localization, and runtime validation using RViz2 and rqt tools.
 
-LiDAR and IMU integration
+---
 
-Sensor fusion using robot_localization
+The repository is organized into three primary ROS 2 packages:
 
-SLAM-based mapping
+```text
+tortoisebot_description/
+├── urdf/              # Robot model (links, joints, sensors)
+├── launch/            # robot_state_publisher launch files
+└── package.xml
 
-AMCL localization
+tortoisebot_gazebo/
+├── launch/            # Gazebo spawn launch files
+├── worlds/            # Gazebo world files
+└── package.xml
 
-Autonomous navigation using Nav2
+tortoisebot_nav/
+├── config/            # EKF, AMCL, Nav2 parameter YAML files
+├── maps/              # Saved maps
+├── launch/            # SLAM, localization, navigation launch files
+└── package.xml
+```
 
-The system implements a full mobile robotics pipeline:
+---
 
-Robot Model → Gazebo → Sensor Fusion → SLAM/Localization → Nav2 → Autonomous Navigation
+## Key Features
 
-Repository Structure
-4-wheeled-robot_Navigation/
-├── tortoisebot_description/   # URDF and robot_state_publisher launch
-├── tortoisebot_gazebo/        # Gazebo world and spawn launch files
-├── tortoisebot_nav/           # SLAM, localization, navigation configs
+* 4-wheeled differential drive robot model  
+* Accurate inertial and collision properties  
+* Gazebo physics simulation  
+* Wheel odometry publishing  
+* IMU simulation  
+* Sensor fusion using **robot_localization (EKF)**  
+* Filtered odometry output (`/odometry/filtered`)  
+* 2D SLAM mapping  
+* AMCL-based localization  
+* Autonomous navigation using **Nav2**  
+* Goal execution and visualization in RViz2  
 
-Note: The robot model is defined entirely using URDF/Xacro. No external mesh files are used.
+**NOTE**: Raw wheel odometry accumulates integration error over time (*drift*).  
+The **Extended Kalman Filter (EKF)** fuses wheel odometry and IMU data to generate a stable `/odometry/filtered` output, which significantly improves localization accuracy and navigation stability.
 
-System Architecture
-High-Level Flow
+---
 
-URDF/Xacro defines robot structure and joints
+## Software Requirements
 
-Gazebo simulates:
+* **ROS 2 Jazzy**
+* Gazebo (via `ros_gz_sim`)
+* Nav2
+* SLAM Toolbox
+* robot_localization
+* rqt tools
 
-Differential drive motion
+### Required Packages
 
-Wheel odometry
+```bash
+sudo apt install \
+  ros-jazzy-ros-gz-sim \
+  ros-jazzy-robot-localization \
+  ros-jazzy-slam-toolbox \
+  ros-jazzy-nav2-bringup \
+  ros-jazzy-nav2-map-server \
+  ros-jazzy-nav2-amcl \
+  ros-jazzy-robot-state-publisher \
+  ros-jazzy-joint-state-publisher \
+  ros-jazzy-rqt \
+  ros-jazzy-rqt-plot
+```
 
-IMU
+---
 
-LiDAR
+## Build Instructions
 
-robot_localization performs sensor fusion
+```bash
+# Create workspace
+mkdir -p ~/nav_ws/src
+cd ~/nav_ws/src
 
-SLAM builds a map
+# Clone repository
+git clone https://github.com/bineeshajabi/4-wheeled-robot_Navigation.git
 
-AMCL localizes the robot
+# Build workspace
+cd ~/nav_ws
+colcon build --symlink-install
 
-Nav2 performs global and local planning
+# Source workspace
+source install/setup.bash
+```
 
-Phase 1 — Robot Description (tortoisebot_description)
-Purpose
+---
 
-Defines the physical robot model using URDF.
+## Running the Simulation
 
-Robot Model Includes
+### 1. Launch Gazebo and Spawn the Robot
 
-Base chassis
+```bash
+ros2 launch tortoisebot_gazebo spawn_robot.launch.py
+```
 
-Four wheels
+This will:
 
-Differential drive joints
+* Launch Gazebo using `ros_gz_sim`
+* Spawn the 4-wheeled mobile robot
+* Start `robot_state_publisher`
 
-LiDAR sensor
+---
 
-IMU sensor
+### 2. Launch Sensor Fusion (EKF)
 
-Each link contains:
+```bash
+ros2 launch tortoisebot_nav ekf.launch.py
+```
 
-Inertial properties (mass & inertia)
+This will:
 
-Visual geometry
+* Fuse `/odom` and `/imu/data`
+* Publish `/odometry/filtered`
+* Improve odometry consistency and reduce drift
 
-Collision geometry
+---
 
-Proper inertia and collision configuration are critical for stable simulation behavior.
+### 3. Run SLAM (Mapping Mode)
 
-Phase 2 — Gazebo Simulation (tortoisebot_gazebo)
-Purpose
+```bash
+ros2 launch tortoisebot_nav slam.launch.py
+```
 
-Handles physics simulation, wheel control, and sensor data generation.
+To save the generated map:
 
-Differential Drive
-
-The robot uses a differential drive controller:
-
-Left wheels grouped
-
-Right wheels grouped
-
-Controlled via /cmd_vel
-
-Published topics:
-
-/odom
-/tf
-Simulated Sensors
-LiDAR
-
-Publishes:
-
-/scan
-
-Used by:
-
-SLAM
-
-AMCL
-
-Nav2 costmaps
-
-IMU
-
-Publishes:
-
-/imu/data
-
-Used for orientation estimation and sensor fusion.
-
-Phase 3 — Sensor Fusion (Drift Reduction)
-Why Sensor Fusion?
-
-Raw wheel odometry suffers from:
-
-Drift over time
-
-Accumulated integration error
-
-Wheel slippage
-
-To reduce drift, the system integrates robot_localization.
-
-Extended Kalman Filter (EKF)
-
-The EKF fuses:
-
-Wheel odometry (/odom)
-
-IMU data (/imu/data)
-
-It outputs:
-
-/odometry/filtered
-Benefits
-
-Reduced drift
-
-Improved pose estimation
-
-Stabilized localization
-
-Cleaner input for SLAM and Nav2
-
-Frame Structure
-
-Typical frame setup:
-
-map → Global reference frame
-
-odom → Continuous but drifting frame
-
-base_link → Robot body frame
-
-Filtered odometry improves the consistency of the odom → base_link transform.
-
-Phase 4 — SLAM (Mapping Mode)
-
-SLAM builds a 2D occupancy grid map.
-
-Inputs
-
-/scan
-
-/odometry/filtered
-
-Output
-/map
-
-Save the generated map:
-
+```bash
 ros2 run nav2_map_server map_saver_cli -f my_map
-Phase 5 — Localization
+```
 
-Localization uses:
+---
 
-Map Server
+### 4. Run Localization
 
-AMCL
+```bash
+ros2 launch tortoisebot_nav localization.launch.py
+```
 
-Lifecycle Manager
+This will:
 
-AMCL uses:
+* Load the saved map
+* Start AMCL
+* Estimate robot pose in the `map` frame
 
-Laser scan data
+---
 
-Filtered odometry
+### 5. Start Autonomous Navigation
 
-This ensures stable pose estimation on the saved map.
+```bash
+ros2 launch tortoisebot_nav navigation.launch.py
+```
 
-Phase 6 — Autonomous Navigation
+This will:
 
-Start navigation:
+* Start Nav2 planner and controller servers
+* Enable global and local costmaps
+* Allow goal setting in RViz2
 
-ros2 launch tortoisebot_nav navigation_launch.py
+---
 
-Using RViz2, you can:
+## TF Tree
 
-Set a 2D goal pose
+You can visualize the TF structure using:
 
-Visualize the global path
-
-Observe local costmaps
-
-Monitor robot movement
-
-Navigation Flow
-
-Goal set in RViz
-
-Global planner computes path
-
-Local planner avoids obstacles
-
-/cmd_vel commands sent
-
-Robot moves in Gazebo
-
-TF Tree 
-
+```bash
 ros2 run tf2_tools view_frames
+```
+
+Expected TF hierarchy:
+
+```text
+map
+ └── odom
+      └── base_link
+           ├── laser
+           ├── imu_link
+           └── wheels
+```
+
+(Insert TF diagram screenshot here if needed.)
+
+---
+
+## Runtime Validation
+
+Check filtered odometry:
+
+```bash
+ros2 topic echo /odometry/filtered
+```
+
+Check TF frames:
+
+```bash
+ros2 run tf2_tools view_frames
+```
+
+Check active navigation nodes:
+
+```bash
+ros2 lifecycle nodes
+```
+
+Monitor pose estimation in RViz2 and verify stable localization during motion.
+
+---
+
+## Expected Behavior
+
+* Robot spawns correctly in Gazebo  
+* Sensors publish valid `/scan`, `/imu/data`, and `/odom`  
+* EKF outputs stable `/odometry/filtered`  
+* SLAM builds an accurate occupancy grid map  
+* AMCL localizes robot reliably  
+* Nav2 plans and executes autonomous paths  
+* Robot reaches target goals without excessive drift  
+
+---
+
+## Conclusion
+
+This project demonstrates a complete **ROS 2 mobile robot navigation system with sensor fusion**, including:
+
+* Differential drive simulation  
+* IMU + wheel odometry fusion via EKF  
+* Drift reduction using filtered odometry  
+* SLAM-based mapping  
+* AMCL localization  
+* Autonomous navigation with Nav2  
+
+It serves as a structured reference implementation for developing robust mobile robot navigation systems in simulation before deploying to real hardware.
