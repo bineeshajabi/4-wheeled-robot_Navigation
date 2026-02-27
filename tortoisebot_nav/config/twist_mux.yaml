@@ -1,0 +1,11 @@
+#To declare cmd_vel of type message TwistStamped
+twist_mux:
+  ros__parameters:
+    use_stamped: true
+    output_topic: cmd_vel
+
+    topics:
+      nav2:
+        topic: cmd_vel_nav
+        timeout: 0.5
+        priority: 50
