@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Macro for Gazebo physical properties -->
+  <xacro:macro name="gazebo_physical_properties" params="controller_type chassis_size wheel_radius wheel_width">
+    <!-- Extract parameters -->
+    <xacro:property name="L" value="${float(chassis_size.split()[0])}"/>
+    <xacro:property name="W" value="${float(chassis_size.split()[1])}"/>
+    <xacro:property name="wheel_radius" value="${float(wheel_radius)}"/>
+    <xacro:property name="wheel_width" value="${float(wheel_width)}"/>
+  
+</xacro:macro>
+</robot>

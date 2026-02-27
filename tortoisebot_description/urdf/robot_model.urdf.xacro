@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<robot name="tortoisebot" xmlns:xacro="http://www.ros.org/wiki/xacro" >
+
+  <!-- Xacro parameters -->
+  <xacro:property name="chassis_size" value="1.2 0.8 0.3"/>
+  <xacro:property name="chassis_mass" value="1.0"/>
+  <xacro:property name="chassis_material" value="Gray"/>
+  <xacro:property name="lidar_radius" value="0.1"/>
+  <xacro:property name="lidar_height" value="0.08"/>
+  <xacro:property name="lidar_mass" value="0.2"/>
+  <xacro:property name="lidar_material" value="Red"/>
+  <xacro:property name="camera_size" value="0.08 0.2 0.08"/>
+  <xacro:property name="camera_mass" value="0.1"/>
+  <xacro:property name="camera_material" value="Blue"/>
+  <xacro:property name="imu_size" value="0.08 0.2 0.08"/>
+  <xacro:property name="imu_mass" value="0.1"/>
+  <xacro:property name="imu_material" value="Green"/>
+  <xacro:property name="wheel_radius" value="0.22"/>
+  <xacro:property name="wheel_width" value="0.12"/>
+  <xacro:property name="wheel_mass" value="0.5"/>
+  <xacro:property name="wheel_material" value="Black"/>
+  <!-- Front Left wheel -->
+  <xacro:property name="fl_x" value="0.45"/>
+  <xacro:property name="fl_y" value="0.46"/>
+  <xacro:property name="fl_z" value="-0.15"/>
+
+  <!-- Front Right wheel -->
+  <xacro:property name="fr_x" value="0.45"/>
+  <xacro:property name="fr_y" value="-0.46"/>
+  <xacro:property name="fr_z" value="-0.15"/>
+
+  <!-- Rear Left wheel -->
+  <xacro:property name="rl_x" value="-0.45"/>
+  <xacro:property name="rl_y" value="0.46"/>
+  <xacro:property name="rl_z" value="-0.15"/>
+
+  <!-- Rear Right wheel -->
+  <xacro:property name="rr_x" value="-0.45"/>
+  <xacro:property name="rr_y" value="-0.46"/>
+  <xacro:property name="rr_z" value="-0.15"/>
+  
+  <xacro:property name="lidar_z" value="0.19"/>
+  <xacro:property name="imu_x" value="0.64"/>
+  <xacro:property name="imu_z" value="0.12"/>
+  <xacro:property name="camera_x" value="0.64"/>
+  <xacro:property name="controller_type" value="diff_4w"/>
+  <xacro:include filename="$(find tortoisebot_description)/urdf/robot_define.urdf.xacro"/>
+
+</robot>
