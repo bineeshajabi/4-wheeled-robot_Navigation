@@ -12,17 +12,19 @@ The repository is organized into three primary ROS 2 packages:
 tortoisebot_description/
 ├── urdf/              # Robot model (links, joints, sensors)
 ├── launch/            # robot_state_publisher launch files
+├── rviz/
 └── package.xml
 
 tortoisebot_gazebo/
 ├── launch/            # Gazebo spawn launch files
-├── worlds/            # Gazebo world files
+├── world/            # Gazebo world files
+├── config/
 └── package.xml
 
 tortoisebot_nav/
 ├── config/            # EKF, AMCL, Nav2 parameter YAML files
 ├── maps/              # Saved maps
-├── launch/            # SLAM, localization, navigation launch files
+├── world/            # SLAM, localization, navigation launch files
 └── package.xml
 ```
 
@@ -50,7 +52,7 @@ The **Extended Kalman Filter (EKF)** fuses wheel odometry and IMU data to genera
 ## Software Requirements
 
 * **ROS 2 Jazzy**
-* Gazebo (via `ros_gz_sim`)
+* Gazebo 
 * Nav2
 * SLAM Toolbox
 * robot_localization
@@ -99,7 +101,7 @@ source install/setup.bash
 ### 1. Launch Gazebo and Spawn the Robot
 
 ```bash
-ros2 launch tortoisebot_gazebo spawn_robot.launch.py
+ros2 launch tortoisebot_gazebo tortoisebot_gazebo.launch.py
 ```
 
 This will:
@@ -107,16 +109,9 @@ This will:
 * Launch Gazebo using `ros_gz_sim`
 * Spawn the 4-wheeled mobile robot
 * Start `robot_state_publisher`
+* Launch sensor fusion (EKF)
 
----
-
-### 2. Launch Sensor Fusion (EKF)
-
-```bash
-ros2 launch tortoisebot_nav ekf.launch.py
-```
-
-This will:
+  This will:
 
 * Fuse `/odom` and `/imu/data`
 * Publish `/odometry/filtered`
@@ -124,10 +119,10 @@ This will:
 
 ---
 
-### 3. Run SLAM (Mapping Mode)
+### 2. Run SLAM (Mapping Mode)
 
 ```bash
-ros2 launch tortoisebot_nav slam.launch.py
+ros2 launch tortoisebot_gazebo tortoisebot_slam_map.launch.py
 ```
 
 To save the generated map:
@@ -138,10 +133,10 @@ ros2 run nav2_map_server map_saver_cli -f my_map
 
 ---
 
-### 4. Run Localization
+### 3. Run Localization using SLAM
 
 ```bash
-ros2 launch tortoisebot_nav localization.launch.py
+ros2 launch tortoisebot_gazebo tortoisebot_slam_localise.launch.py
 ```
 
 This will:
@@ -152,10 +147,10 @@ This will:
 
 ---
 
-### 5. Start Autonomous Navigation
+### 4. Start Autonomous Navigation
 
 ```bash
-ros2 launch tortoisebot_nav navigation.launch.py
+ros2 launch tortoisebot_nav tortoisebot_nav_localise.launch.py
 ```
 
 This will:
@@ -163,29 +158,6 @@ This will:
 * Start Nav2 planner and controller servers
 * Enable global and local costmaps
 * Allow goal setting in RViz2
-
----
-
-## TF Tree
-
-You can visualize the TF structure using:
-
-```bash
-ros2 run tf2_tools view_frames
-```
-
-Expected TF hierarchy:
-
-```text
-map
- └── odom
-      └── base_link
-           ├── laser
-           ├── imu_link
-           └── wheels
-```
-
-(Insert TF diagram screenshot here if needed.)
 
 ---
 
