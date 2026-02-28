@@ -116,6 +116,10 @@ This will:
 * Fuse `/odom` and `/imu/data`
 * Publish `/odometry/filtered`
 * Improve odometry consistency and reduce drift
+  
+<img width="1211" height="863" alt="Screenshot from 2026-02-28 10-44-01" src="https://github.com/user-attachments/assets/ad4bb0a0-708b-46d2-9f1e-5a3b598e76f3" />
+
+<img width="1060" height="865" alt="Screenshot from 2026-02-28 10-45-28" src="https://github.com/user-attachments/assets/2500be2f-d1c3-49bc-ac58-cd8135f11478" />
 
 ---
 
@@ -144,6 +148,8 @@ This will:
 * Load the saved map
 * Start AMCL
 * Estimate robot pose in the `map` frame
+* 
+<img width="1221" height="857" alt="Screenshot from 2026-02-28 10-46-53" src="https://github.com/user-attachments/assets/bf0d1602-8c76-4310-87f3-11b3de9a7933" />
 
 ---
 
@@ -151,6 +157,7 @@ This will:
 
 ```bash
 ros2 launch tortoisebot_nav tortoisebot_nav_localise.launch.py
+ros2 launch tortoisebot_nav navigation.launch.py
 ```
 
 This will:
@@ -158,6 +165,8 @@ This will:
 * Start Nav2 planner and controller servers
 * Enable global and local costmaps
 * Allow goal setting in RViz2
+
+<img width="1195" height="923" alt="Screenshot from 2026-02-28 10-50-07" src="https://github.com/user-attachments/assets/7320801a-f741-47f3-8572-1c2c330ad4cf" />
 
 ---
 
@@ -174,6 +183,7 @@ Check TF frames:
 ```bash
 ros2 run tf2_tools view_frames
 ```
+<img width="1337" height="718" alt="Screenshot from 2026-02-28 10-51-38" src="https://github.com/user-attachments/assets/781e93bd-c61d-4117-a0f1-958bbc5900e7" />
 
 Check active navigation nodes:
 
